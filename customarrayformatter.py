@@ -1,5 +1,5 @@
 '''
-customarrayparse.py
+customarrayformatter.py
 
 Command line tool / python module to convert Excel (.xlsx) and delimited
 text files (.csv or tab delimited .txt) into properly formatted tab
@@ -7,7 +7,7 @@ delimited text files for the Custom Array oligo synthesizer.
 
 Usage:
 
->>> python customarrayparse.py [input file] -o [output file]
+>>> python customarrayformatter.py [input file] -o [output file]
 
 The file conversion process is fairly tolerate to formatting discrepencies
 and may prompt the user for additional input in non-typical circumstances 
@@ -22,7 +22,7 @@ import re
 import openpyxl         # Lib for dealing with .xlsx files (MIT License)
 
 
-class CustomArrayParse(object):
+class CustomArrayFormatter(object):
 
     def __init__(self, input_file, output_file=None):
         with open(input_file):  # Make sure the file exists 
@@ -155,6 +155,6 @@ if __name__ == '__main__':
     ap.add_argument('--output_file', '-o', 
                     help='Optional output filepath/filename')
     args = ap.parse_args()
-    cp = CustomArrayParse(args.input_file, args.output_file)
+    cp = CustomArrayFormatter(args.input_file, args.output_file)
     cp.parseFile()
     cp.writeFile()

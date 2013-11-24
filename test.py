@@ -1,45 +1,45 @@
 '''
 test.py 
 
-Contains unit tests for customarrayparse.py
+Contains unit tests for customarrayformatter.py
 
 '''
 
-from customarrayparse import CustomArrayParse
+from customarrayformatter import CustomArrayFormatter
 
 # Tab delimited input file
-test = CustomArrayParse('test/tab_delim.txt')
+test = CustomArrayFormatter('test/tab_delim.txt')
 test.process()
 
 # Blank lines in inupt file
-test = CustomArrayParse('test/blank_lines.csv')
+test = CustomArrayFormatter('test/blank_lines.csv')
 test.process()
 
 # Reversed columns in input file
-test = CustomArrayParse('test/reversed_columns.csv')
+test = CustomArrayFormatter('test/reversed_columns.csv')
 test.process()
 
 # Multiple oligo name duplicates in input file
-test = CustomArrayParse('test/multiple_duplicates.csv')
+test = CustomArrayFormatter('test/multiple_duplicates.csv')
 test.process()
 
 # Custom output file
-test = CustomArrayParse('test/tab_delim.txt', 
+test = CustomArrayFormatter('test/tab_delim.txt', 
 					    output_file='test/CUSTOM_OUTPUT_FN.txt')
 test.process()
 
 # Xslx test
-test = CustomArrayParse('test/xlsx_test.xlsx')
+test = CustomArrayFormatter('test/xlsx_test.xlsx')
 test.process()
 
 # Full 12k test
-test = CustomArrayParse('test/12k.csv')
+test = CustomArrayFormatter('test/12k.csv')
 test.process()
 
 # Full 96k test
-test = CustomArrayParse('test/96k.csv')
+test = CustomArrayFormatter('test/96k.csv')
 test.process()
 
 # Multiple oligo name duplicates in input file
-test = CustomArrayParse('test/three_columns.csv')
+test = CustomArrayFormatter('test/three_columns.csv')
 test.process()
