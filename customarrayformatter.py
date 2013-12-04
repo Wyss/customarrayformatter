@@ -7,7 +7,7 @@ delimited text files for the Custom Array oligo synthesizer.
 
 Usage:
 
->>> python customarrayformatter.py [input file] -o [output file]
+$ python customarrayformatter.py [input file] -o [output file]
 
 The file conversion process is fairly tolerate to formatting discrepencies
 and may prompt the user for additional input in non-typical circumstances 
