@@ -3,14 +3,14 @@ customarrayformatter.py
 
 Command line tool / python module to convert Excel (.xlsx) and delimited
 text files (.csv or tab delimited .txt) into properly formatted tab
-delimited text files for the Custom Array oligo synthesizer. 
+delimited text files for the Custom Array oligo synthesizer.
 
 Usage:
 
 $ python customarrayformatter.py [input file] -o [output file]
 
 The file conversion process is fairly tolerate to formatting discrepencies
-and may prompt the user for additional input in non-typical circumstances 
+and may prompt the user for additional input in non-typical circumstances
 (e.g., if the number of columns in the input file is greater than 2).
 
 '''
@@ -25,7 +25,7 @@ import openpyxl         # Lib for dealing with .xlsx files (MIT License)
 class CustomArrayFormatter(object):
 
     def __init__(self, input_file, output_file=None):
-        with open(input_file):  # Make sure the file exists 
+        with open(input_file):  # Make sure the file exists
             pass
         self.input_file = input_file
         self.output_file = output_file
@@ -48,7 +48,7 @@ class CustomArrayFormatter(object):
             row_data = self._readInDelim()
         else:
             raise ValueError('Input file must be a .xlsx, .csv, or .txt file')
-        # Remove blank/empty cells 
+        # Remove blank/empty cells
         self.row_data = filter(_checkCell, row_data)
         # Ask user to ID columns if needed, otherwise automatically ID columns
         nc = len(self.row_data[0])
@@ -56,23 +56,23 @@ class CustomArrayFormatter(object):
             print 'Input file contains more than 2 columns of data: '
             for index, cell in enumerate(self.row_data[0]):
                 print '\t Column {}: {}'.format(index + 1, cell)
-            self.seq_col = self._reqCol(nc, '\t-> Enter oligo sequence column ' 
+            self.seq_col = self._reqCol(nc, '\t-> Enter oligo sequence column '
                                             'number')
             self.name_col = self._reqCol(nc, '\t-> Enter sequence name column '
                                              'number')
         else:
-            self.seq_col = 0 if re.match('[ATGC\s]', self.row_data[0][0]) else 1
+            self.seq_col = 0 if re.match('^[ATGC\s]+$', self.row_data[0][0]) else 1
             self.name_col = 0 if self.seq_col else 1
         self._dataQC()
 
-        
+
     def writeFile(self):
         if not self.output_file:
             fp, ext = os.path.splitext(self.input_file)
             self.output_file = fp + '_CUSTOMARRAY.txt'
         with open(self.output_file, 'wb') as out_fd:
             for row in self.row_data:
-                out_fd.write(row[self.seq_col] + '\t' + row[self.name_col] + 
+                out_fd.write(row[self.seq_col] + '\t' + row[self.name_col] +
                              '\r\n')
         print 'Output file {} successfully written.'.format(self.output_file)
         self._printStats()
@@ -111,13 +111,13 @@ class CustomArrayFormatter(object):
         prev_name = None
         prev_name_count = 0
         for index, cell in enumerate(self.row_data):
-            # Remove white space    
+            # Remove white space
             cell[self.name_col] = cell[self.name_col].strip()
             cell[self.seq_col] = cell[self.seq_col].strip()
             # Print warning if oligo length is greater than 200 bp
             if len(cell[self.seq_col]) > 170:
-                print ('WARNING: oligo {} is >170 bp in length: \n\t[{}bp]-> {}' 
-                      ''.format(cell[self.name_col], len(cell[self.seq_col]), 
+                print ('WARNING: oligo {} is >170 bp in length: \n\t[{}bp]-> {}'
+                      ''.format(cell[self.name_col], len(cell[self.seq_col]),
                                 cell[self.seq_col]))
             # Modify name if oligo name is a duplicate
             if cell[self.name_col] == prev_name:
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('input_file', help='Input .xlsx, .csv, or .txt file ' +
                                        'containing oligo names and sequences')
-    ap.add_argument('--output_file', '-o', 
+    ap.add_argument('--output_file', '-o',
                     help='Optional output filepath/filename')
     args = ap.parse_args()
     cp = CustomArrayFormatter(args.input_file, args.output_file)
