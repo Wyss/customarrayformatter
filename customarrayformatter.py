@@ -61,7 +61,7 @@ class CustomArrayFormatter(object):
             self.name_col = self._reqCol(nc, '\t-> Enter sequence name column '
                                              'number')
         else:
-            self.seq_col = 0 if re.match('^[ATGC\s]+$', self.row_data[0][0]) else 1
+            self.seq_col = 0 if re.match('^[atgcATGC\s]+$', self.row_data[0][0]) else 1
             self.name_col = 0 if self.seq_col else 1
         self._dataQC()
 
@@ -115,6 +115,9 @@ class CustomArrayFormatter(object):
             cell[self.name_col] = cell[self.name_col].strip()
             cell[self.seq_col] = cell[self.seq_col].strip()
             # Print warning if oligo length is greater than 200 bp
+            if len(cell[self.seq_col]) < 168:
+                print len(cell[self.seq_col])
+                print cell
             if len(cell[self.seq_col]) > 170:
                 print ('WARNING: oligo {} is >170 bp in length: \n\t[{}bp]-> {}'
                       ''.format(cell[self.name_col], len(cell[self.seq_col]),
