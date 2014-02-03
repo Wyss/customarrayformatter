@@ -18,8 +18,11 @@ and may prompt the user for additional input in non-typical circumstances
 import argparse
 import os
 import re
+import sys
 
 import openpyxl         # Lib for dealing with .xlsx files (MIT License)
+
+_PY3 = sys.version_info[0] == 3
 
 
 class CustomArrayFormatter(object):
@@ -49,13 +52,13 @@ class CustomArrayFormatter(object):
         else:
             raise ValueError('Input file must be a .xlsx, .csv, or .txt file')
         # Remove blank/empty cells
-        self.row_data = filter(_checkCell, row_data)
+        self.row_data = list(filter(_checkCell, row_data))
         # Ask user to ID columns if needed, otherwise automatically ID columns
         nc = len(self.row_data[0])
         if nc > 2:
-            print 'Input file contains more than 2 columns of data: '
+            print('Input file contains more than 2 columns of data: ')
             for index, cell in enumerate(self.row_data[0]):
-                print '\t Column {}: {}'.format(index + 1, cell)
+                print('\t Column {}: {}'.format(index + 1, cell))
             self.seq_col = self._reqCol(nc, '\t-> Enter oligo sequence column '
                                             'number')
             self.name_col = self._reqCol(nc, '\t-> Enter sequence name column '
@@ -72,9 +75,13 @@ class CustomArrayFormatter(object):
             self.output_file = fp + '_CUSTOMARRAY.txt'
         with open(self.output_file, 'wb') as out_fd:
             for row in self.row_data:
-                out_fd.write(row[self.seq_col] + '\t' + row[self.name_col] +
-                             '\r\n')
-        print 'Output file {} successfully written.'.format(self.output_file)
+                if _PY3:
+                    out_fd.write(bytes(row[self.seq_col] + '\t' +
+                                 row[self.name_col] + '\r\n', 'UTF-8'))
+                else:
+                    out_fd.write(row[self.seq_col] + '\t' +
+                                 row[self.name_col] + '\r\n')
+        print('Output file {} successfully written.'.format(self.output_file))
         self._printStats()
 
 
@@ -86,7 +93,10 @@ class CustomArrayFormatter(object):
 
     def _readInDelim(self):
         with open(self.input_file, 'rb') as fd:
-            fc = fd.read()
+            if _PY3:
+                fc = fd.read().decode('utf-8')
+            else:
+                fc = fd.read()
         rows = None
         for nl_delim in ('\r\n', '\n\r', '\r', '\n'):
             if re.search(nl_delim, fc):
@@ -116,12 +126,12 @@ class CustomArrayFormatter(object):
             cell[self.seq_col] = cell[self.seq_col].strip()
             # Print warning if oligo length is greater than 200 bp
             if len(cell[self.seq_col]) < 168:
-                print len(cell[self.seq_col])
-                print cell
+                print(len(cell[self.seq_col]))
+                print(cell)
             if len(cell[self.seq_col]) > 170:
-                print ('WARNING: oligo {} is >170 bp in length: \n\t[{}bp]-> {}'
+                print(('WARNING: oligo {} is >170 bp in length: \n\t[{}bp]-> {}'
                       ''.format(cell[self.name_col], len(cell[self.seq_col]),
-                                cell[self.seq_col]))
+                                cell[self.seq_col])))
             # Modify name if oligo name is a duplicate
             if cell[self.name_col] == prev_name:
                 prev_name_count += 1
@@ -133,22 +143,22 @@ class CustomArrayFormatter(object):
 
     def _printStats(self):
         seq_lengths = [len(cell[self.seq_col]) for cell in self.row_data]
-        print 'Output file statistics: '
-        print '\tNumber of oligos: {}'.format(len(seq_lengths))
-        print '\tMax oligo length: {}'.format(max(seq_lengths))
-        print '\tMin oligo length: {}'.format(min(seq_lengths))
-        print '\tAvg oligo length: {}'.format(sum(seq_lengths)/len(seq_lengths))
+        print('Output file statistics: ')
+        print('\tNumber of oligos: {}'.format(len(seq_lengths)))
+        print('\tMax oligo length: {}'.format(max(seq_lengths)))
+        print('\tMin oligo length: {}'.format(min(seq_lengths)))
+        print('\tAvg oligo length: {}'.format(sum(seq_lengths)/len(seq_lengths)))
 
     def _reqCol(self, num_cols, msg):
         while True:
             try:
-                col = int(raw_input(msg + ': '))
+                col = int(input(msg + ': '))
                 if col > num_cols:
-                    print 'Column number must be > 0 and <= {}'.format(num_cols)
+                    print('Column number must be > 0 and <= {}'.format(num_cols))
                 else:
                     return col - 1
             except TypeError:
-                print 'Column number must be an integer'
+                print('Column number must be an integer')
 
 
 if __name__ == '__main__':
